@@ -1,0 +1,37 @@
+{{define "index"}}
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Media</title>
+    </head>
+    <body>
+        <ul>
+            {{range $filename, $link := .MediaList}}
+            <li><span onclick="startMedia('{{$link}}');">{{$filename}}</span></li>
+            {{end}}
+        </ul>
+        <span>
+            <h2>Player</h2>
+            <audio id="player" src="" controls>
+                <a id="dload" href="">Download</a>
+            </audio>
+        </span>
+        <script language="JavaScript" type="application/javascript">
+            function startMedia(media) {
+                console.log("startMedia(" + media + ")");
+                var player = document.getElementById("player");
+                console.log("player: ", player);
+                var dload = document.getElementById("dload");
+                console.log("dload:  ", dload);
+                player.src = media;
+                console.log("player.currentSrc: ", player.currentSrc);
+                dload.href = media;
+                console.log("dload.href: ", dload.href);
+
+                player.play();
+                console.log("player.play()");
+            }
+        </script>
+    </body>
+</html>
+{{end}}
