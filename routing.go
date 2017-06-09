@@ -6,7 +6,9 @@ func ConstructRoutes() http.Handler {
 	handler := http.DefaultServeMux
 
 	handler.HandleFunc("/" + PATH_MEDIA, MediaHandler)
+	handler.HandleFunc("/" + PATH_MEDIA + "/", MediaHandler)
 	handler.HandleFunc("/" + PATH_STATIC, StaticHandler)
+	handler.HandleFunc("/" + PATH_STATIC + "/", StaticHandler)
 	handler.HandleFunc("/" + PATH_IMAGES, StaticHandler)
 	handler.HandleFunc("/" + PATH_ANDROID_HIRES, StaticHandler)
 	handler.HandleFunc("/" + PATH_ANDROID_NORMAL, StaticHandler)
