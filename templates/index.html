@@ -14,7 +14,7 @@
             {{range $filename, $mediaContent := .MediaList}}
             <li class="list-group-item">
                 <span class="badge">{{$mediaContent.Duration}}</span>
-                <span onclick="startMedia('{{$mediaContent.Path}}');">{{$filename}}</span>
+                <span onclick="startMedia('{{$mediaContent.Path}}');">{{$mediaContent.Title}}</span>
             </li>
             {{end}}
         </ul>
