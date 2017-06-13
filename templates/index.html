@@ -11,10 +11,10 @@
     </head>
     <body>
         <ul class="list-group">
-            {{range $filename, $mediaContent := .MediaList}}
+            {{range $artist := .Artists}}
             <li class="list-group-item">
                 <span class="badge">{{$mediaContent.Duration}}</span>
-                <span onclick="startMedia('{{$mediaContent.Path}}');">{{$mediaContent.Title}}</span>
+                <span onclick="startMedia('{{$mediaContent.Path}}');">{{if ne $mediaContent.Track ""}}{{$mediaContent.Track}} - {{end}}{{$mediaContent.Title}}</span>
             </li>
             {{end}}
         </ul>
