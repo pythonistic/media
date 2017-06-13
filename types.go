@@ -24,6 +24,10 @@ func (artists Artists) Contains(artist *Artist) (*Artist, bool) {
 	return nil, false
 }
 
+func (artists Artists) GetByName(name string) (*Artist, bool) {
+	return artists.Contains(&Artist{Name: name,})
+}
+
 type Albums []*Album
 
 func (albums Albums) Len() int {
@@ -48,6 +52,10 @@ func (albums Albums) Contains(album *Album) (*Album, bool) {
 	return nil, false
 }
 
+func (albums Albums) GetByName(name string) (*Album, bool) {
+	return albums.Contains(&Album{Name: name,})
+}
+
 type Tracks []*Track
 
 func (tracks Tracks) Len() int {
@@ -62,17 +70,28 @@ func (tracks Tracks) Less(i, j int) bool {
 	return tracks[i].Track < tracks[j].Track
 }
 
+func (tracks Tracks) GetByTrackTitle(track string, title string) (*Track, bool) {
+	for _, myTrack := range tracks {
+		if myTrack.Track == track && myTrack.Title == title {
+			return myTrack, true
+		}
+	}
+
+	return nil, false
+}
+
 type Artist struct {
 	Name string
-	Albums Albums
+	Albums *Albums
 }
 
 type Album struct {
 	Name string
 	Year string
-	Tracks Tracks
+	Tracks *Tracks
 	CoverArtMimeType string
 	CoverArtBytes []byte
+	CoverArtPath string
 }
 
 type Track struct {
@@ -84,5 +103,5 @@ type Track struct {
 }
 
 type PageContext struct {
-	Artists []*Artist
+	Artists *Artists
 }

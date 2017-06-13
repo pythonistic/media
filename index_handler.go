@@ -4,15 +4,14 @@ import (
 	"net/http"
 	"os"
 	"html/template"
+	"fmt"
 )
 
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	pctx := &PageContext{
-		Artists: make(Artists, 0),
+		Artists: artists,
 	}
-
-	scanMedia(FSPATH_MEDIA, pctx.Artists)
 
 	// create the template
 	indexTemplate, err := template.New("index").ParseFiles("templates/index.html")
@@ -46,6 +45,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	//		return htmlFragment.String()
 	//	},
 	//}
+
+fmt.Printf("artists: %v\n", pctx.Artists)
 
 	// pass the page context as the parameters to be processed by the template
 	err = indexTemplate.ExecuteTemplate(w, "index", pctx)

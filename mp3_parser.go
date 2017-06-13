@@ -6,6 +6,7 @@ import (
 	"github.com/tcolgate/mp3"
 	"time"
 	"fmt"
+	"github.com/mikkyang/id3-go/v2"
 )
 
 const TAG_ALBUM = "TALB"
@@ -17,10 +18,10 @@ const TAG_TRACK = "TRCK"
 
 func parseMp3File(fname string, fpath string) (artist *Artist, album *Album, track *Track) {
 	artist = &Artist{
-		Albums: make(Albums, 0),
+		Albums: new(Albums),
 	}
 	album = &Album{
-		Tracks: make(Tracks, 0),
+		Tracks: new(Tracks),
 	}
 	track = &Track{}
 
@@ -38,12 +39,22 @@ func parseMp3File(fname string, fpath string) (artist *Artist, album *Album, tra
 			track.Title = mp3File.Title()
 			track.Track = mp3File.Frame(TAG_TRACK).String()
 
-			switch i := pictureFrame.(type) {
-			case nil:
-				println("No picture for " + track.Track)
-			default:
-				fmt.Printf("Picture not the expected type: %v\n", i)
-				fmt.Printf("pictureFrame: %v\n", pictureFrame)
+			//switch i := pictureFrame.(type) {
+			//case nil:
+			//	println("No picture for " + track.Track)
+			//case v2.ImageFrame:
+			//	imageFrame := pictureFrame.(v2.ImageFrame)
+			//	album.CoverArtBytes = imageFrame.Data()
+			//	album.CoverArtMimeType = imageFrame.Encoding()
+			//default:
+			//	fmt.Printf("Picture not the expected type: %v\n", i)
+			//	fmt.Printf("pictureFrame: %v\n", pictureFrame)
+			//}
+			if pictureFrame != nil {
+				imageFrame := pictureFrame.(*v2.ImageFrame)
+				album.CoverArtBytes = imageFrame.Data()
+				album.CoverArtMimeType = imageFrame.Encoding()
+				album.CoverArtPath = "/" + PATH_ALBUM_ART + "/" + artist.Name + "/" + album.Name
 			}
 		}
 

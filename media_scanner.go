@@ -8,7 +8,14 @@ import (
 	"fmt"
 )
 
-func scanMedia(root string, artists Artists) {
+var artists *Artists = new(Artists)
+
+func init() {
+	scanMedia(FSPATH_MEDIA)
+	sortMedia()
+}
+
+func scanMedia(root string) {
 	// scan the media
 	mediaPath, err := os.Open(root)
 	if err != nil {
@@ -40,31 +47,35 @@ func scanMedia(root string, artists Artists) {
 			if ok {
 				artist = foundArtist
 			} else {
-				artists = append(artists, artist)
+				*artists = append(*artists, artist)
 			}
 
 			// does the album exist?
 			foundAlbum, ok := artist.Albums.Contains(album)
 			if ok {
 				album = foundAlbum
+			} else {
+				*artist.Albums = append(*artist.Albums, album)
 			}
 
 			// append the track
-			album.Tracks = append(album.Tracks, track)
+			track.Filename = fname
+			track.Path = fpath
+			*album.Tracks = append(*album.Tracks, track)
 		} else {
-			scanMedia(filepath.Join(root, file.Name()), artists)
+			scanMedia(filepath.Join(root, file.Name()))
 		}
 	}
 }
 
 // sortMedia() sorts the media into output order.
-func sortMedia(artists Artists) {
+func sortMedia() {
 	sort.Sort(artists)
 
-	for _, artist := range artists {
+	for _, artist := range *artists {
 		sort.Sort(artist.Albums)
-		for _, album := range artist.Albums {
-			sort.Sort(album.Tracks)
+		for _, album := range *artist.Albums {
+			sort.Sort(*album.Tracks)
 		}
 	}
 

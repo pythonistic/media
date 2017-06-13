@@ -10,36 +10,59 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     </head>
     <body>
-        <ul class="list-group">
-            {{range $artist := .Artists}}
-            <li class="list-group-item">
-                <span class="badge">{{$mediaContent.Duration}}</span>
-                <span onclick="startMedia('{{$mediaContent.Path}}');">{{if ne $mediaContent.Track ""}}{{$mediaContent.Track}} - {{end}}{{$mediaContent.Title}}</span>
-            </li>
-            {{end}}
-        </ul>
-        <span>
-            <h2>Player</h2>
-            <audio id="player" src="" controls>
-                <a id="dload" href="">Download</a>
-            </audio>
-        </span>
+    <div class="container">
+        <div class="col-md-8">
+            <ul class="list-group">
+                {{range $artist := .Artists}}
+                <li class="list-group-item" data-toggle="collapse">
+                    <span>{{ $artist.Name }}</span>
+                    <ul>
+                        <span>{{ range $album := $artist.Albums }}</span>
+                        <li class="list-group-item" data-toggle="collapse">{{ $album.Name }}
+                            <ul>
+                                <span>{{ range $track := $album.Tracks }}</span>
+                                <li class="list-group-item">
+                                    <span class="badge">{{$track.Duration}}</span>
+                                    <span onclick="startMedia('{{$track.Path}}', '{{ $album.CoverArtPath }}');">{{if ne $track.Track ""}}{{$track.Track}} - {{end}}{{$track.Title}}</span>
+                                </li>
+                                {{ end }}
+                            </ul>
+                        </li>
+                        {{ end }}
+                    </ul>
+                </li>
+                {{end}}
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <div>
+                    <h2>Player</h2>
+                    <img src="/static/images/no-song.png" class="img-responsive" id="albumArt"/>
+                    <audio id="player" src="" controls>
+                        <a id="dload" href="">Download</a>
+                    </audio>
+                </span>
+            </div>
+            <div>
+                <span>
+                    <h2>Playlist</h2>
+                </span>
+            </div>
+        </div>
+    </div>
         <script language="JavaScript" type="application/javascript">
-            function startMedia(media) {
-                console.log("startMedia(" + media + ")");
+            function startMedia(media, artPath) {
                 var player = document.getElementById("player");
-                console.log("player: ", player);
                 var dload = document.getElementById("dload");
-                console.log("dload:  ", dload);
+                var albumArt = document.getElementById("albumArt");
                 player.src = media;
-                console.log("player.currentSrc: ", player.currentSrc);
                 dload.href = media;
-                console.log("dload.href: ", dload.href);
+                albumArt.src = artPath;
 
                 player.play();
-                console.log("player.play()");
             }
         </script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     </body>
 </html>
