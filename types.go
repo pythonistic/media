@@ -1,5 +1,7 @@
 package media
 
+import "strconv"
+
 type Artists []*Artist
 
 func (artists Artists) Len() int {
@@ -14,6 +16,10 @@ func (artists Artists) Less(i, j int) bool {
 	return artists[i].Name < artists[j].Name
 }
 
+func (artists Artists) Get(i int) *Artist {
+	return artists[i]
+}
+
 func (artists Artists) Contains(artist *Artist) (*Artist, bool) {
 	for _, myArtist := range artists {
 		if myArtist.Name == artist.Name {
@@ -25,7 +31,7 @@ func (artists Artists) Contains(artist *Artist) (*Artist, bool) {
 }
 
 func (artists Artists) GetByName(name string) (*Artist, bool) {
-	return artists.Contains(&Artist{Name: name,})
+	return artists.Contains(&Artist{Name: name, })
 }
 
 type Albums []*Album
@@ -42,6 +48,10 @@ func (albums Albums) Less(i, j int) bool {
 	return albums[i].Name < albums[j].Name
 }
 
+func (albums Albums) Get(i int) *Album {
+	return albums[i]
+}
+
 func (albums Albums) Contains(album *Album) (*Album, bool) {
 	for _, myAlbum := range albums {
 		if myAlbum.Name == album.Name {
@@ -53,7 +63,7 @@ func (albums Albums) Contains(album *Album) (*Album, bool) {
 }
 
 func (albums Albums) GetByName(name string) (*Album, bool) {
-	return albums.Contains(&Album{Name: name,})
+	return albums.Contains(&Album{Name: name, })
 }
 
 type Tracks []*Track
@@ -67,6 +77,13 @@ func (tracks Tracks) Swap(i, j int) {
 }
 
 func (tracks Tracks) Less(i, j int) bool {
+	first, err := strconv.Atoi(tracks[i].Track)
+	if err == nil {
+		second, err := strconv.Atoi(tracks[j].Track)
+		if err == nil {
+			return first < second
+		}
+	}
 	return tracks[i].Track < tracks[j].Track
 }
 
@@ -81,25 +98,28 @@ func (tracks Tracks) GetByTrackTitle(track string, title string) (*Track, bool) 
 }
 
 type Artist struct {
-	Name string
+	Name   string
 	Albums *Albums
+	Id     string
 }
 
 type Album struct {
-	Name string
-	Year string
-	Tracks *Tracks
+	Name             string
+	Year             string
+	Tracks           *Tracks
 	CoverArtMimeType string
-	CoverArtBytes []byte
-	CoverArtPath string
+	CoverArtBytes    []byte
+	CoverArtPath     string
+	Id               string
 }
 
 type Track struct {
-	Filename        string
-	Path            string
-	Title           string
-	Duration        string
-	Track           string
+	Filename string
+	Path     string
+	Title    string
+	Duration string
+	Track    string
+	Id       string
 }
 
 type PageContext struct {

@@ -1,69 +1,94 @@
-{{define "index"}}
+{{ define "index"}}
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Media</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    </head>
-    <body>
-    <div class="container">
-        <div class="col-md-8">
-            <ul class="list-group">
-                {{range $artist := .Artists}}
-                <li class="list-group-item" data-toggle="collapse">
-                    <span>{{ $artist.Name }}</span>
-                    <ul>
-                        <span>{{ range $album := $artist.Albums }}</span>
-                        <li class="list-group-item" data-toggle="collapse">{{ $album.Name }}
-                            <ul>
-                                <span>{{ range $track := $album.Tracks }}</span>
-                                <li class="list-group-item">
-                                    <span class="badge">{{$track.Duration}}</span>
-                                    <span onclick="startMedia('{{$track.Path}}', '{{ $album.CoverArtPath }}');">{{if ne $track.Track ""}}{{$track.Track}} - {{end}}{{$track.Title}}</span>
-                                </li>
-                                {{ end }}
-                            </ul>
-                        </li>
-                        {{ end }}
-                    </ul>
-                </li>
-                {{end}}
-            </ul>
-        </div>
-        <div class="col-md-4">
-            <div>
-                    <h2>Player</h2>
-                    <img src="/static/images/no-song.png" class="img-responsive" id="albumArt"/>
-                    <audio id="player" src="" controls>
-                        <a id="dload" href="">Download</a>
-                    </audio>
-                </span>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Media</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <style>
+        .list-group-artist {
+            padding-left: 0px;
+        }
+
+        .list-group-album {
+            padding-left: 15px;
+        }
+
+        .list-group-track {
+            padding-left: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-8">
+        <div class="list-group list-group-artist">
+            {{ range $artist := .Artists}}
+            <a href="#artist_{{ $artist.Id }}" class="list-group-item" data-toggle="collapse">
+                <i class="glyphicon glyphicon-triangle-right"></i><span>{{ $artist.Name }}</span>
+            </a>
+            <div class="list-group list-group-album collapse" id="artist_{{ $artist.Id }}">
+                {{ range $album := $artist.Albums }}
+                <a href="#album_{{ $album.Id }}" class="list-group-item" data-toggle="collapse">
+                    <i class="glyphicon glyphicon-triangle-right"></i><span>{{ $album.Name }}</span>
+                </a>
+                <div class="list-group list-group-track collapse" id="album_{{ $album.Id }}">
+                    {{ range $track := $album.Tracks }}
+                    <a href="#" class="list-group-item">
+                        <span class="badge">{{ $track.Duration }}</span>
+                        <span onclick="startMedia('{{ $track.Path }}', '{{ $album.CoverArtPath }}');">{{ if ne $track.Track "" }}{{ $track.Track }} - {{ end }}{{ $track.Title }}</span>
+                    </a>
+                    {{ end }}
+                </div>
+                {{ end }}
             </div>
-            <div>
+
+            {{ end }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div>
+            <h2>Player</h2>
+            <img src="/static/images/no-song.png" class="img-responsive" id="albumArt"/>
+            <audio id="player" src="" controls>
+                <a id="dload" href="">Download</a>
+            </audio>
+            </span>
+        </div>
+        <div>
                 <span>
                     <h2>Playlist</h2>
                 </span>
-            </div>
         </div>
     </div>
-        <script language="JavaScript" type="application/javascript">
-            function startMedia(media, artPath) {
-                var player = document.getElementById("player");
-                var dload = document.getElementById("dload");
-                var albumArt = document.getElementById("albumArt");
-                player.src = media;
-                dload.href = media;
-                albumArt.src = artPath;
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+<script language="JavaScript" type="application/javascript">
+    function startMedia(media, artPath) {
+        var player = document.getElementById("player");
+        var dload = document.getElementById("dload");
+        var albumArt = document.getElementById("albumArt");
+        player.src = media;
+        dload.href = media;
+        albumArt.src = artPath;
 
-                player.play();
-            }
-        </script>
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    </body>
+        player.play();
+    }
+
+    $('.list-group-item').on('click', function() {
+        $('.glyphicon', this)
+            .toggleClass('glyphicon-triangle-right')
+            .toggleClass('glyphicon-triangle-bottom')
+    });
+</script>
+</body>
 </html>
-{{end}}
+{{ end }}

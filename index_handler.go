@@ -4,9 +4,13 @@ import (
 	"net/http"
 	"os"
 	"html/template"
-	"fmt"
 )
 
+var artists *Artists
+
+func SetArtists(a *Artists) {
+	artists = a
+}
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	pctx := &PageContext{
@@ -21,32 +25,12 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	// add functions to the templates
 	//funcMap := template.FuncMap{
-	//	"MatchedDomain": func() string {
+	//	"SomeFunction": func() string {
 	//		var htmlFragment bytes.Buffer
-	//		matchedDomain := ""
-	//		zuulHosts := strings.Split(_auth_config.Config("handler.hosts"), ",")
 	//
-	//		for idx, domain := range zuulHosts {
-	//			if strings.Contains(pctx.Request.Host, domain) {
-	//				// copy the request URL so we can safely modify it
-	//				var ssoUrl *url.URL = pctx.Request.URL
-	//				ssoUrl.Path = "signoutSSO"
-	//				ssoUrl.Host = domain
-	//
-	//				logoutDomainTemplate.ExecuteTemplate(&htmlFragment, "logout_domain", struct {
-	//					Index         int
-	//					MatchedDomain string
-	//					MatchedSsoUrl string
-	//				}{
-	//					idx, matchedDomain, ssoUrl.String(),
-	//				})
-	//			}
-	//		}
 	//		return htmlFragment.String()
 	//	},
 	//}
-
-fmt.Printf("artists: %v\n", pctx.Artists)
 
 	// pass the page context as the parameters to be processed by the template
 	err = indexTemplate.ExecuteTemplate(w, "index", pctx)
