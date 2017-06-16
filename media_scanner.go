@@ -78,6 +78,8 @@ func scanMedia(root string) *Artists {
 			}
 
 			// append the track
+			track.Artist = artist.Name
+			track.Album = album.Name
 			track.Filename = fname
 			track.Path = fpath
 			track.Id = strconv.Itoa(id)

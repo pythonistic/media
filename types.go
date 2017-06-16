@@ -2,6 +2,7 @@ package media
 
 import "strconv"
 
+// Artists is the parent media structure, consisting of []*Artist -> []*Album -> []*Track
 type Artists []*Artist
 
 func (artists Artists) Len() int {
@@ -34,6 +35,7 @@ func (artists Artists) GetByName(name string) (*Artist, bool) {
 	return artists.Contains(&Artist{Name: name, })
 }
 
+// Albums is the type containing all the *Album structs and tracks for a specific artist.
 type Albums []*Album
 
 func (albums Albums) Len() int {
@@ -66,6 +68,7 @@ func (albums Albums) GetByName(name string) (*Album, bool) {
 	return albums.Contains(&Album{Name: name, })
 }
 
+// Tracks contains all the *Track structs for an Album.
 type Tracks []*Track
 
 func (tracks Tracks) Len() int {
@@ -97,12 +100,80 @@ func (tracks Tracks) GetByTrackTitle(track string, title string) (*Track, bool) 
 	return nil, false
 }
 
+// Playlists is the type containing all the Playlist structs
+type Playlists []*Playlist
+
+func (playlists Playlists) Len() int {
+	return len(playlists)
+}
+
+func (playlists Playlists) Swap(i, j int) {
+	playlists[i], playlists[j] = playlists[j], playlists[i]
+}
+
+func (playlists Playlists) Less(i, j int) bool {
+	return playlists[i].Name < playlists[j].Name
+}
+
+func (playlists Playlists) Get(i int) *Playlist {
+	return playlists[i]
+}
+
+func (playlists Playlists) Contains(playlist *Playlist) (*Playlist, bool) {
+	for _, myPlaylist := range playlists {
+		if myPlaylist.Name == playlist.Name && myPlaylist.User == playlist.User{
+			return myPlaylist, true
+		}
+	}
+
+	return nil, false
+}
+
+func (playlists Playlists) GetByName(user *User, name string) (*Playlist, bool) {
+	return playlists.Contains(&Playlist{Name: name, User: user})
+}
+
+// Users is the type containing all the User structs
+type Users []*User
+
+func (users Users) Len() int {
+	return len(users)
+}
+
+func (users Users) Swap(i, j int) {
+	users[i], users[j] = users[j], users[i]
+}
+
+func (users Users) Less(i, j int) bool {
+	return users[i].Name < users[j].Name
+}
+
+func (users Users) Get(i int) *User {
+	return users[i]
+}
+
+func (users Users) Contains(user *User) (*User, bool) {
+	for _, myUser := range users {
+		if myUser.Email == user.Email {
+			return myUser, true
+		}
+	}
+
+	return nil, false
+}
+
+func (users Users) GetByEmail(email string) (*User, bool) {
+	return users.Contains(&User{Email: email})
+}
+
+// Artist is a single artist
 type Artist struct {
 	Name   string
 	Albums *Albums
 	Id     string
 }
 
+// Album is a single album, belonging to an Artist
 type Album struct {
 	Name             string
 	Year             string
@@ -113,7 +184,10 @@ type Album struct {
 	Id               string
 }
 
+// Track is a single track, belonging to an Album
 type Track struct {
+	Artist   string
+	Album    string
 	Filename string
 	Path     string
 	Title    string
@@ -122,6 +196,23 @@ type Track struct {
 	Id       string
 }
 
+// Playlist is an ordered collection of Tracks
+type Playlist struct {
+	User   *User
+	Name   string
+	Tracks []*Track
+}
+
+// User is the user account record
+type User struct {
+	Name string
+	Email string
+	// consider using a map of cookies, IPs, and registration dates for passwordless logins
+}
+
+// PageContext contains the structs needed to render the media page.
 type PageContext struct {
-	Artists *Artists
+	Artists   *Artists
+	Playlists []*Playlist		// a slice of *Playlist with only playlists belonging to user
+	User      *User
 }
