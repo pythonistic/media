@@ -25,8 +25,7 @@ func main() {
 
 	HandleSignals()
 
-	artists := media.PrepareMedia(media.FSPATH_MEDIA)
-	media.SetArtists(artists)
+	media.LoadMedia()
 	router := media.ConstructRoutes()
 
 	if err := ListenAndServe(addr, router); err != nil {

@@ -7,9 +7,19 @@ import (
 )
 
 var artists *Artists
+var playlists *Playlists
+var users *Users
 
 func SetArtists(a *Artists) {
 	artists = a
+}
+
+func SetPlaylists(p *Playlists) {
+	playlists = p
+}
+
+func SetUsers(u *Users) {
+	users = u
 }
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {

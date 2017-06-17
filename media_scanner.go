@@ -24,13 +24,13 @@ func init() {
 }
 
 func PrepareMedia(path string) *Artists {
-	artists := scanMedia(path)
+	artists = new(Artists)
+	scanMedia(path, artists)
 	sortMedia(artists)
 	return artists
 }
 
-func scanMedia(root string) *Artists {
-	artists := new(Artists)
+func scanMedia(root string, artists *Artists) {
 	// scan the media
 	mediaPath, err := os.Open(root)
 	if err != nil {
@@ -89,11 +89,9 @@ func scanMedia(root string) *Artists {
 
 			*album.Tracks = append(*album.Tracks, track)
 		} else {
-			scanMedia(filepath.Join(root, file.Name()))
+			scanMedia(filepath.Join(root, file.Name()), artists)
 		}
 	}
-
-	return artists
 }
 
 // sortMedia() sorts the media into output order.

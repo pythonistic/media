@@ -5,8 +5,8 @@ import (
 	"os"
 	"github.com/tcolgate/mp3"
 	"time"
-	"fmt"
 	"github.com/mikkyang/id3-go/v2"
+	"strings"
 )
 
 const TAG_ALBUM = "TALB"
@@ -33,11 +33,11 @@ func parseMp3File(fname string, fpath string) (artist *Artist, album *Album, tra
 		} else {
 			defer mp3File.Close()
 
-			album.Name = mp3File.Album()
-			artist.Name = mp3File.Artist()
+			album.Name = strings.TrimSpace(mp3File.Album())
+			artist.Name = strings.TrimSpace(mp3File.Artist())
 			pictureFrame := mp3File.Frame(TAG_PICTURE)
-			track.Title = mp3File.Title()
-			track.Track = mp3File.Frame(TAG_TRACK).String()
+			track.Title = strings.TrimSpace(mp3File.Title())
+			track.Track = strings.TrimSpace(mp3File.Frame(TAG_TRACK).String())
 
 			//switch i := pictureFrame.(type) {
 			//case nil:
@@ -57,8 +57,6 @@ func parseMp3File(fname string, fpath string) (artist *Artist, album *Album, tra
 				album.CoverArtPath = "/" + PATH_ALBUM_ART + "/" + artist.Name + "/" + album.Name
 			}
 		}
-
-		fmt.Printf("Artist=%v Album=%v Track=%v\n", artist, album, track)
 	}()
 
 	// parse the file content
