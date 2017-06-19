@@ -61,9 +61,27 @@
             </span>
         </div>
         <div>
-                <span>
-                    <h2>Playlist</h2>
+            {{ if .User }}
+            <span>
+                <h2>Playlist</h2>
+            </span>
+                {{ range $playlist := .Playlists }}
+            <span>
+                    {{ $playlist.Name }}
                 </span>
+                    {{ range $track := $playlist.Tracks }}
+            <span>
+                        {{ $track.title }}
+                </span>
+                    {{ end }}
+                {{ end }}
+            {{ else }}
+            <form action="login" method="post" id="email_form">
+                <label for="email_address">Sign in with your email address:</label>
+                <input type="email" id="email_address" size="32" maxlength="256"/>
+                <br/><span id="alert_email" style="display: none; color: crimson">Missing email address!</span>
+            </form>
+            {{ end }}
         </div>
     </div>
 </div>
@@ -72,6 +90,8 @@
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
 <script language="JavaScript" type="application/javascript">
+    var do_submit = false;
+
     function startMedia(media, artPath) {
         var player = document.getElementById("player");
         var dload = document.getElementById("dload");
@@ -83,11 +103,42 @@
         player.play();
     }
 
+    function submit_email() {
+        var email_form = document.getElementById("email_form");
+        var email_address = document.getElementById("email_address");
+        var email_alert = document.getElementById("alert_email");
+        var address = email_address.value.trim();
+        alert("Address: " + address);
+        if (len(address) < 1 || address.indexOf("@") < 0) {
+            alert("Invalid email");
+            alert_email.setAttribute("display", "all");
+        } else {
+            alert("Valid email");
+            email_form.submit();
+        }
+    }
+
     $('.list-group-item').on('click', function() {
         $('.glyphicon', this)
             .toggleClass('glyphicon-triangle-right')
             .toggleClass('glyphicon-triangle-bottom')
     });
+
+    $('#email_address').on('keypress', function(evt) {
+        if (!do_submit && (evt.which == 13 || evt.which == 9 || evt.which == 10)) {
+            var address = $('#email_address').val().trim();
+            if (address.length < 1 || address.indexOf("@") < 0) {
+                $('#alert_email').show(75);
+                return false;
+            } else {
+                do_submit = true;
+                $('#email_form').submit();
+            }
+        }
+
+        // else, all other characters pass
+        return true;
+    })
 </script>
 </body>
 </html>

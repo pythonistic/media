@@ -1,6 +1,9 @@
 package media
 
-import "strconv"
+import (
+	"strconv"
+	"time"
+)
 
 // Artists is the parent media structure, consisting of []*Artist -> []*Album -> []*Track
 type Artists []*Artist
@@ -121,7 +124,7 @@ func (playlists Playlists) Get(i int) *Playlist {
 
 func (playlists Playlists) Contains(playlist *Playlist) (*Playlist, bool) {
 	for _, myPlaylist := range playlists {
-		if myPlaylist.Name == playlist.Name && myPlaylist.User == playlist.User{
+		if myPlaylist.Name == playlist.Name && myPlaylist.User == playlist.User {
 			return myPlaylist, true
 		}
 	}
@@ -131,6 +134,17 @@ func (playlists Playlists) Contains(playlist *Playlist) (*Playlist, bool) {
 
 func (playlists Playlists) GetByName(user *User, name string) (*Playlist, bool) {
 	return playlists.Contains(&Playlist{Name: name, User: user})
+}
+
+func (playlists Playlists) GetForUser(user *User) ([]*Playlist) {
+	pls := make([]*Playlist, 0)
+	for _, myPlaylist := range playlists {
+		if myPlaylist.User == user {
+			pls = append(pls, myPlaylist)
+		}
+	}
+
+	return pls
 }
 
 // Users is the type containing all the User structs
@@ -205,14 +219,23 @@ type Playlist struct {
 
 // User is the user account record
 type User struct {
-	Name string
+	Name  string
 	Email string
 	// consider using a map of cookies, IPs, and registration dates for passwordless logins
+}
+
+// Email token is the association of a token and email address
+type Token struct {
+	Code       string
+	Email      string
+	Expiration time.Time
 }
 
 // PageContext contains the structs needed to render the media page.
 type PageContext struct {
 	Artists   *Artists
-	Playlists []*Playlist		// a slice of *Playlist with only playlists belonging to user
+	Playlists []*Playlist // a slice of *Playlist with only playlists belonging to user
 	User      *User
+	Error     string
+	Info      string
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"encoding/json"
+	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 
@@ -53,7 +54,10 @@ func (db *Database) StoreArtists(artists *Artists) (err error) {
 			return
 		}
 		artistKey := []byte(artist.Name)
-		db.Put(artistKey, artistBytes, &opt.WriteOptions{})
+		err = db.Put(artistKey, artistBytes, &opt.WriteOptions{})
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -82,7 +86,10 @@ func (db *Database) StorePlaylists(playlists *Playlists) (err error) {
 			return
 		}
 		playlistKey := []byte(playlist.Name)
-		db.Put(playlistKey, playlistBytes, &opt.WriteOptions{})
+		err = db.Put(playlistKey, playlistBytes, &opt.WriteOptions{})
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -111,7 +118,39 @@ func (db *Database) StoreUsers(users *Users) (err error) {
 			return
 		}
 		userKey := []byte(user.Email)
-		db.Put(userKey, userBytes, &opt.WriteOptions{})
+		err = db.Put(userKey, userBytes, &opt.WriteOptions{})
+		if err != nil {
+			return
+		}
 	}
+	return
+}
+
+func (db *Database) GetToken(code string) (token *Token, err error) {
+	limit := code + "\u0000"
+	iter := db.NewIterator(&util.Range{
+		Limit: []byte(limit),
+		Start: []byte(code),
+	}, nil)
+	for iter.Next() {
+		tokenBytes := iter.Value()
+		token = &Token{}
+		if err = json.Unmarshal(tokenBytes, token); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func (db *Database) StoreToken(token *Token) (err error) {
+	var tokenBytes []byte
+	tokenBytes, err = json.Marshal(token)
+	if err != nil {
+		return
+	}
+	tokenKey := []byte(token.Code)
+	err = db.Put(tokenKey, tokenBytes, &opt.WriteOptions{})
+
 	return
 }

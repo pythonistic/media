@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"github.com/pythonistic/media"
+	"math/rand"
 )
 
 const EXIT_ERROR_HTTP = 1
@@ -18,6 +19,8 @@ var running bool
 var server *http.Server
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	// a flag that can be used for graceful shutdowns
 	running = true
 

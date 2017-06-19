@@ -5,6 +5,7 @@ import "os"
 const DB_ARTIST = "artists.db"
 const DB_PLAYLIST = "playlists.db"
 const DB_USER = "users.db"
+const DB_TOKEN = "token.db"
 
 func LoadMedia() {
 	// open the database files

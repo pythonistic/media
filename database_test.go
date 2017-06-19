@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"os"
+	"time"
 )
 
 const UT_DB_NAME = "media_ut.db"
@@ -170,4 +171,79 @@ func TestGetUsers(t *testing.T) {
 	if users.Get(0).Email != "alice@unittest.com" {
 		t.Errorf("Incorrect user email, expected alice@unittest.com, got %s", users.Get(0).Email)
 	}
+}
+
+func TestGetToken(t *testing.T) {
+	dbPath := getTempDbPath()
+	db, err := OpenDatabase(dbPath)
+	if err != nil {
+		t.Errorf("Failed to open the database: %v", err)
+		t.FailNow()
+	}
+
+	defer func() {
+		err = db.CloseDatabase()
+		removeTempDbDir(dbPath)
+		if err != nil {
+			t.Errorf("Failed to close the database: %v", err)
+			t.FailNow()
+		}
+
+	}()
+
+	// create and store some tokens
+	token1 := &Token{
+		Code: "alpha",
+		Email: "12345@67890",
+		Expiration: time.Now(),
+	}
+
+	token2 := &Token{
+		Code: "beta",
+		Email: "09876@54321",
+		Expiration: time.Now(),
+	}
+
+	err = db.StoreToken(token1)
+	if err != nil {
+		t.Errorf("Failed to store token 1: %v", err)
+		t.FailNow()
+	}
+	err = db.StoreToken(token2)
+	if err != nil {
+		t.Errorf("Failed to store token 2: %v", err)
+		t.FailNow()
+	}
+
+	// get a token that doesn't exist
+	badToken, err := db.GetToken("gamma")
+	if err != nil {
+		t.Errorf("Unepxected error for token gamma: %v", err)
+		t.FailNow()
+	}
+	if badToken != nil {
+		t.Errorf("BadToken should be nil, got %v", badToken)
+		t.FailNow()
+	}
+
+	// get token 1
+	fetchedToken, err := db.GetToken("alpha")
+	if err != nil {
+		t.Errorf("Excepted error for token alpha: %v", err)
+		t.FailNow()
+	}
+	if fetchedToken == nil {
+		t.Error("Unexpected nil token for alpha")
+		t.FailNow()
+	}
+	if fetchedToken.Code != token1.Code {
+		t.Errorf("Code mismatch, expected %s got %s", token1.Code, fetchedToken.Code)
+	}
+	if fetchedToken.Email != token1.Email {
+		t.Errorf("Email mismatch, expected %s got %s", token1.Email, fetchedToken.Email)
+	}
+	if fetchedToken.Expiration != token1.Expiration {
+		t.Errorf("Expiration mismatch, expected %v got %v", token1.Expiration, fetchedToken.Expiration)
+	}
+
 }

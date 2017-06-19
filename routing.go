@@ -16,6 +16,8 @@ func ConstructRoutes() http.Handler {
 	handler.HandleFunc("/" + PATH_APPLE_PRECOMP, StaticHandler)
 	handler.HandleFunc("/" + PATH_APPLE_TOUCH, StaticHandler)
 	handler.HandleFunc("/" + PATH_FAVICON, StaticHandler)
+	handler.HandleFunc("/" + PATH_LOGIN, LoginHandler)
+	handler.HandleFunc("/" + PATH_TOKEN + "/", TokenHandler)
 	handler.HandleFunc("/", IndexHandler)
 
 	return handler
