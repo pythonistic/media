@@ -246,4 +246,19 @@ func TestGetToken(t *testing.T) {
 		t.Errorf("Expiration mismatch, expected %v got %v", token1.Expiration, fetchedToken.Expiration)
 	}
 
+	// delete token 1
+	err = db.DeleteToken(fetchedToken)
+	if err != nil {
+		t.Errorf("Unexpected error when deleting an existing token: %v", err)
+		t.FailNow()
+	}
+	fetchedToken2, err := db.GetToken("alpha")
+	if err != nil {
+		t.Errorf("Unexpected error for token alpha: %v", err)
+		t.FailNow()
+	}
+	if fetchedToken2 != nil {
+		t.Errorf("Didn't expect a token, got %v", fetchedToken2)
+		t.FailNow()
+	}
 }

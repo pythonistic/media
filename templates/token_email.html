@@ -1,1 +1,9 @@
-{{ define "" }}
+{{ define "token_email" }}
+<h3>Your Media Login Token</h3>
+<p>
+    Please click the following link to register your Media login.  This is a single-use token.
+</p>
+<p>
+    <a href="{{ .LoginToken }}" target="_blank">{{ .LoginToken }}</a>
+</p>
+{{ end }}

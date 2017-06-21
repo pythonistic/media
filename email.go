@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 	"html/template"
+	"crypto/tls"
+	"errors"
 )
 
 const TOKEN_LIFESPAN = 1 * time.Hour
@@ -18,6 +20,11 @@ const MAIL_FROM_ADDRESS = "noone@unittest.com"
 const MAIL_SUBJECT = "Media login token"
 const MAIL_REPLY_TO = "noone@unittest.com"
 const MAIL_SERVER = "localhost"
+const MAIL_USE_TLS = true
+
+var mailTlsConfig = &tls.Config{
+
+}
 
 func sendTokenEmail(requestUrl *url.URL, emailAddress string) (err error) {
 	// create the token
@@ -31,12 +38,11 @@ func sendTokenEmail(requestUrl *url.URL, emailAddress string) (err error) {
 	requestString := requestUrl.String()
 	tokenUrl := requestString[0:strings.LastIndex(requestString, "/")] + "/" + PATH_TOKEN + "/" + token.Code
 
-
 	// create a boundary ID
 	boundary := fmt.Sprintf("%x", md5.Sum([]byte(token.Code)))
 
 	// create the mail message
-	emailFields := map[string]string{"ChangePassword": tokenUrl}
+	emailFields := map[string]string{"LoginToken": tokenUrl}
 	emailBody := bytes.NewBuffer(make([]byte, 0))
 
 	// write RFC 822 message headers
@@ -75,13 +81,15 @@ func sendTokenEmail(requestUrl *url.URL, emailAddress string) (err error) {
 	}
 
 	// queue the email
-	//err = smtp.SendMail(_reset_config.Config("email.server"), nil, _reset_config.Config("email.from"), []string{token.Email}, emailBody.Bytes())
-	//if err != nil {
-	//	_reset_logger.Error("Couldn't send email message to %s: %v", token.Email, err.Error())
-	//}
 	conn, err := smtp.Dial(MAIL_SERVER)
 	if err != nil {
 		os.Stderr.WriteString("Couldn't connect to email server: " + err.Error() + "\n")
+	}
+	if MAIL_USE_TLS {
+		err := conn.StartTLS(mailTlsConfig)
+		if err != nil {
+			os.Stderr.WriteString("Couldn't STARTTLS with email server: " + err.Error() + "\n")
+		}
 	}
 	err = conn.Hello("EHLO")
 	if err != nil {
@@ -113,7 +121,7 @@ func sendTokenEmail(requestUrl *url.URL, emailAddress string) (err error) {
 			os.Stderr.WriteString("Error writing email message to SMTP server, may not have been sent: " + err.Error() + "\n")
 		} else {
 			os.Stderr.WriteString("Sent token reset message to vendor email " + token.Email + "\n")
-			db := getTokenDatabae()
+			db := getTokenDatabase()
 			db.StoreToken(token)
 			err = nil
 			return
@@ -122,17 +130,27 @@ func sendTokenEmail(requestUrl *url.URL, emailAddress string) (err error) {
 	return
 }
 
-func processEmailToken(code string) (*Token, error) {
+func processEmailToken(code string) (token *Token, err error) {
 	// load the token from the database
+	db := getTokenDatabase()
+	token, err = db.GetToken(code)
+	if err != nil {
+		return
+	}
 
 	// is the token expired?
+	if token.Expiration.Before(time.Now()) {
+		return nil, errors.New("Token expired.")
+
+	}
 
 	// delete the token from the database
+	err = db.DeleteToken(token)
 
-	return &Token{}, nil
+	return
 }
 
-func getTokenDatabae() *Database {
+func getTokenDatabase() *Database {
 	tokenDb, err := OpenDatabase(DB_TOKEN)
 	if err != nil {
 		os.Stderr.WriteString(err.Error())

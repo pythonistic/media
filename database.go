@@ -7,11 +7,12 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-
+// Database is a structure to hold a reference to an open LevelDB.
 type Database struct {
 	*leveldb.DB
 }
 
+// Open the LevelDB file at the directory path.
 func OpenDatabase(dbPath string) (database *Database, err error) {
 	var db *leveldb.DB
 	db, err = leveldb.OpenFile(dbPath, &opt.Options{})
@@ -23,6 +24,7 @@ func OpenDatabase(dbPath string) (database *Database, err error) {
 	return
 }
 
+// Close the open LevelDB.
 func (db *Database) CloseDatabase() (err error) {
 	if err = db.Close(); err != nil {
 		return
@@ -153,4 +155,9 @@ func (db *Database) StoreToken(token *Token) (err error) {
 	err = db.Put(tokenKey, tokenBytes, &opt.WriteOptions{})
 
 	return
+}
+
+func (db *Database) DeleteToken(token *Token) (err error) {
+	tokenKey := []byte(token.Code)
+	return db.Delete(tokenKey, &opt.WriteOptions{})
 }
