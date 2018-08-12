@@ -1,10 +1,10 @@
 package media
 
 import (
-	"net/http"
-	"github.com.old/goware/emailx"
-	"os"
+	"github.com/goware/emailx"
 	"html/template"
+	"net/http"
+	"os"
 )
 
 const PATH_LOGIN = "login"
